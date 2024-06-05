@@ -5,8 +5,13 @@
 @ C functions are used to initialize the pins.
 @
 @
-	.EQU GPIO_OUT, 1
-	.EQU sleep_time, 200	@ Used with the sleep_ms function
+
+#include "hardware/regs/addressmap.h"
+#include "hardware/regs/sio.h"
+
+
+.EQU GPIO_OUT, 1
+.EQU sleep_time, 200	@ Used with the sleep_ms function
 
 .thumb_func
 .global main	        @ Provide program starting address
@@ -30,12 +35,14 @@ main:
 
 loop:
 @ Turn each pin on, sleep and then turn the pin off
-	mov R5, #0xd0		//Put number 0x000000d0
-	lsl r5, #24			//SIO base address 0xd0000000 in r2
+	LDR	R5, gpiobase	//Load address of SIO base
 
 	mov r6, #0b01111111		//Used to set bits for pins 0-6
-	str r6,[r5, #0x14]		//Offset address for SIO_OUT_SET is 0x14
+	str r6,[r5, #SIO_GPIO_OUT_SET_OFFSET]	//Set pins to high
 
 	
     B       loop	@ loop forever
 
+
+.align  4	@ necessary alignment
+gpiobase:	.word	SIO_BASE     @ base of the GPIO registers
