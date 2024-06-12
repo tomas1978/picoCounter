@@ -91,7 +91,15 @@ loop:
 
 	str r6,[r5, #SIO_GPIO_OUT_CLR_OFFSET]	//Set pins to 0
 
-	mov r6, #0b11111111		//Bit pattern for digit '7'
+	mov r6, #0b11111111		//Bit pattern for digit '8'
+	str r6,[r5, #SIO_GPIO_OUT_SET_OFFSET]	//Set pins to high
+
+	ldr r0, =sleep_time
+	bl sleep_ms
+
+	str r6,[r5, #SIO_GPIO_OUT_CLR_OFFSET]	//Set pins to 0
+
+	mov r6, #0b11100111		//Bit pattern for digit '9'
 	str r6,[r5, #SIO_GPIO_OUT_SET_OFFSET]	//Set pins to high
 
 	ldr r0, =sleep_time
