@@ -2,7 +2,6 @@
 @ Assembler program to flash three LEDs connected to the
 @ Raspberry Pi Pico GPIO port using the Pico SDK.
 @
-
 	.EQU	START_PIN, 0
 	.EQU 	END_PIN, 7
 	.EQU	GPIO_OUT, 1
@@ -25,23 +24,20 @@ main:
 		BLE init_loop
 
 loop:   
-	MOV R0, #0b00000110
-	BL link_gpio_put_all
+	MOV R5, #1	@Starting value for counter
+	MOV R6, #0	@Memory offset for bit pattern array
+	counter_loop:
+		LDR R4, =counterPatterns
+		LDR R0, [R4, R6]
+		BL link_gpio_put_all
 
-	LDR R0, =sleep_time
-	BL sleep_ms
+		LDR R0, =sleep_time
+		BL sleep_ms
 
-	MOV R0, #0b011011011
-	BL link_gpio_put_all
-	
-	LDR R0, =sleep_time
-	BL sleep_ms
+		ADD R6, #4
+		CMP R6, #3
+		BLT counter_loop 
+	B loop
 
-	MOV R0, #0b01001111
-	BL link_gpio_put_all
-	
-	LDR R0, =sleep_time
-	BL sleep_ms
-
-
-	B       loop
+.data
+counterPatterns: .word 0b00000110, 0b01011011, 0b01001111, 0b01100110
