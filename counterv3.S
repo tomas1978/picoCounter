@@ -69,6 +69,19 @@ counter_loop:
 	ADD R4, #1
 	CMP R4, R5
 	BLT counter_loop
+	
+	MOV R4, #0
+reverse_count_loop:
+	SUB R7, #4
+	LDR R0, [R6,R7] 
+	BL	link_gpio_put_all
+	LDR	R0, =sleep_time
+	BL	sleep_ms
+	ADD R4, #1
+	CMP R4, R5
+	BLT reverse_count_loop
+
+	
 	B loop
 
 .data
