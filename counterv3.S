@@ -1,61 +1,30 @@
 @
-@ Assembler program to flash three LEDs connected to the
-@ Raspberry Pi Pico GPIO port using the Pico SDK.
+@ Assembler program to make a counter showing numbers 0,..,9
+@ on a 7-segment display using the Pico SDK.
+@ Counts from 0 up to 9, then counts back to 0, and repeats
 @
-
-	.EQU	SEG_A, 0
-	.EQU	SEG_B, 1
-	.EQU	SEG_C, 2
-	.EQU	SEG_D, 3
-	.EQU	SEG_E, 4
-	.EQU	SEG_F, 5
-	.EQU	SEG_G, 6
 	
 	.EQU	GPIO_OUT, 1
 	.EQU	sleep_time, 500
 
-.thumb_func	@ Necessary because sdk uses BLX
+.thumb_func		@ Necessary because sdk uses BLX
 .global main    @ Provide program starting address
 
 main:
-	MOV	R0, #SEG_A
+	MOV	R4, #0 	@First GPIO pin number
+	MOV R5, #6 	@Last GPIO pin number
+init_loop:	
+	MOV R0, R4 	@Move GPIO number to paramter 1
 	BL	gpio_init
-	MOV	R0, #SEG_A
-	MOV	R1, #GPIO_OUT
+	MOV	R0, R4  @Move GPIO number to paramter 1
+	MOV	R1, #GPIO_OUT @Second parameter: Direction Output=1	
 	BL	link_gpio_set_dir
-	MOV	R0, #SEG_B
-	BL	gpio_init
-	MOV	R0, #SEG_B
-	MOV	R1, #GPIO_OUT
-	BL	link_gpio_set_dir
-	MOV	R0, #SEG_C
-	BL	gpio_init
-	MOV	R0, #SEG_C
-	MOV	R1, #GPIO_OUT
-	BL	link_gpio_set_dir
-	MOV	R0, #SEG_D
-	BL	gpio_init
-	MOV	R0, #SEG_D
-	MOV	R1, #GPIO_OUT
-	BL	link_gpio_set_dir
-	MOV	R0, #SEG_E
-	BL	gpio_init
-	MOV	R0, #SEG_E
-	MOV	R1, #GPIO_OUT
-	BL	link_gpio_set_dir
-	MOV	R0, #SEG_F
-	BL	gpio_init
-	MOV	R0, #SEG_F
-	MOV	R1, #GPIO_OUT
-	BL	link_gpio_set_dir
-	MOV	R0, #SEG_G
-	BL	gpio_init
-	MOV	R0, #SEG_G
-	MOV	R1, #GPIO_OUT
-	BL	link_gpio_set_dir
-
+	ADD R4, #1
+	CMP R4, R5
+	BLE init_loop
+	
 	LDR R6, =led_patterns
-	MOV R5, #5 @Max value of counter
+	MOV R5, #10 @Max value of counter
 	
 loop: 
 	MOV R4, #0 @Loop counter
@@ -80,10 +49,18 @@ reverse_count_loop:
 	ADD R4, #1
 	CMP R4, R5
 	BLT reverse_count_loop
-
 	
 	B loop
 
 .data
 .align 4
-led_patterns: .word 0b0111111, 0b0000110, 0b1011011, 0b1001111, 0b1100110
+led_patterns: 	.word 0b00111111	@0
+				.word 0b00000110 	@1
+				.word 0b01011011 	@2
+				.word 0b01001111 	@3
+				.word 0b01100110	@4
+				.word 0b01101101 	@5
+				.word 0b01111101	@6
+				.word 0b00000111 	@7
+				.word 0b01111111	@8
+				.word 0b01101111	@9
